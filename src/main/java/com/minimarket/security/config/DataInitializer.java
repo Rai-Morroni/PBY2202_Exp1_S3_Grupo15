@@ -16,25 +16,49 @@ public class DataInitializer {
     @Bean
     public CommandLineRunner initData(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         return args -> {
+            // 1. Inicializar Administrador (Gestión global, reportes y auditoría)
             if (usuarioRepository.findByUsername("admin").isEmpty()) {
                 Usuario admin = new Usuario();
                 admin.setUsername("admin");
-                admin.setPassword(passwordEncoder.encode("admin123")); 
-                
-                // Inicializamos el Set para evitar NullPointerException
+                admin.setPassword(passwordEncoder.encode("admin123"));
                 admin.setRoles(new HashSet<>());
 
                 Rol rolAdmin = new Rol();
-                rolAdmin.setNombre("ROLE_ADMIN"); 
-                
+                rolAdmin.setNombre("ROLE_ADMIN");
                 admin.getRoles().add(rolAdmin);
-
-                // Si te da un error de "TransientObjectException" al guardar, 
-                // necesitarás guardar 'rolAdmin' primero usando un RolRepository, 
-                // o bien agregar 'cascade = CascadeType.ALL' en la relación @ManyToMany de tu clase Usuario.
-                usuarioRepository.save(admin);
                 
-                System.out.println("====== Usuario de prueba creado en H2: admin / admin123 con ROLE_ADMIN ======");
+                usuarioRepository.save(admin);
+                System.out.println("====== Usuario Creado: admin / admin123 (ROLE_ADMIN) ======");
+            }
+
+            // 2. Inicializar Empleado (Gestión de inventario y cajas de venta)
+            if (usuarioRepository.findByUsername("empleado").isEmpty()) {
+                Usuario empleado = new Usuario();
+                empleado.setUsername("empleado");
+                empleado.setPassword(passwordEncoder.encode("empleado123"));
+                empleado.setRoles(new HashSet<>());
+
+                Rol rolEmpleado = new Rol();
+                rolEmpleado.setNombre("ROLE_EMPLOYEE");
+                empleado.getRoles().add(rolEmpleado);
+                
+                usuarioRepository.save(empleado);
+                System.out.println("====== Usuario Creado: empleado / empleado123 (ROLE_EMPLOYEE) ======");
+            }
+
+            // 3. Inicializar Cliente (Acceso a fidelización y compras)
+            if (usuarioRepository.findByUsername("cliente").isEmpty()) {
+                Usuario cliente = new Usuario();
+                cliente.setUsername("cliente");
+                cliente.setPassword(passwordEncoder.encode("cliente123"));
+                cliente.setRoles(new HashSet<>());
+
+                Rol rolCliente = new Rol();
+                rolCliente.setNombre("ROLE_USER");
+                cliente.getRoles().add(rolCliente);
+                
+                usuarioRepository.save(cliente);
+                System.out.println("====== Usuario Creado: cliente / cliente123 (ROLE_USER) ======");
             }
         };
     }
